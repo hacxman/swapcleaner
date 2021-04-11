@@ -11,6 +11,8 @@ import System.Process
 swap_trigger_size = 500000 -- 500MB
 run_every = 1000000 -- 1second
 
+swap_device = "/swapfile"
+
 data MemProp = MemProp {
                 memTotal :: Int
                ,memFree :: Int
@@ -52,10 +54,10 @@ run = do
     when ((swapTotal meminfo > 0) && (swapOcc > swap_trigger_size) && (memAvailable meminfo > swapOcc)) $ do
       print meminfo
       putStrLn "Condition met, flipping swap"
-      callCommand "echo swapoff /swapfile"
-      callCommand "swapoff /swapfile"
-      callCommand "echo swapon /swapfile"
-      callCommand "swapon /swapfile"
+      callCommand $ "echo swapoff " ++ swap_device
+      callCommand $ "swapoff " ++ swap_device
+      callCommand $ "echo swapon " ++ swap_device
+      callCommand $ "swapon " ++ swap_device
 
   return ()
 
