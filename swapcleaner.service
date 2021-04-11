@@ -1,0 +1,12 @@
+[Unit]
+Description=Swapcleaner
+[Service]
+Type=simple
+PIDFile=
+ExecStart=/usr/local/bin/swapcleaner
+User=root
+Group=root
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target
