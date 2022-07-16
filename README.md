@@ -18,8 +18,15 @@ Currently it checks:
 ### swap_trigger_size
 in kilobytes, default 500000 (500MB)
 
+### run_every
+in microseconds, default is 10_000_000 (10seconds)
+
+## Changes
+
+* Removed
 ### swap_device
 path to swap, default is /swapfile
+Now swap list is read from /proc/swaps
 
-### run_every
-in microseconds, default is 1000000 (1second)
+* Changed
+### run_every - to 10s from 1s

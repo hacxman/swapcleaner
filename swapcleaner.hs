@@ -1,3 +1,4 @@
+{-# LANGUAGE NumericUnderscores #-}
 module Main
 where
 
@@ -9,9 +10,8 @@ import System.IO
 import System.Process
 
 swap_trigger_size = 500000 -- 500MB
-run_every = 1000000 -- 1second
+run_every = 10_000_000 -- 10 sec
 
-swap_device = "/swapfile"
 
 data MemProp = MemProp {
                 memTotal :: Int
@@ -31,6 +31,12 @@ strToProp p _ = p
 emptyProp = MemProp 0 0 0 0 0
 
 run = do
+  hnd <- openFile "/proc/swaps" ReadMode
+  cont <- hGetContents hnd
+  let swaplines = map words $ tail $ lines cont
+  let swap_devices = map head swaplines
+  putStrLn $ "swaps: " ++ unwords swap_devices
+
   hnd <- openFile "/proc/meminfo" ReadMode
   cont <- hGetContents hnd
 
@@ -54,10 +60,12 @@ run = do
     when ((swapTotal meminfo > 0) && (swapOcc > swap_trigger_size) && (memAvailable meminfo > swapOcc)) $ do
       print meminfo
       putStrLn "Condition met, flipping swap"
-      callCommand $ "echo swapoff " ++ swap_device
-      callCommand $ "swapoff " ++ swap_device
-      callCommand $ "echo swapon " ++ swap_device
-      callCommand $ "swapon " ++ swap_device
+      forM_ swap_devices $ \swap_device -> do
+        callCommand $ "echo swapoff " ++ swap_device
+        callCommand $ "swapoff " ++ swap_device
+      forM_ swap_devices $ \swap_device -> do
+        callCommand $ "echo swapon " ++ swap_device
+        callCommand $ "swapon " ++ swap_device
 
   return ()
 
